@@ -55,15 +55,23 @@ function getLocalIp() {
   return privateIp || candidates[0] || 'localhost';
 }
 
+app.set('trust proxy', 1);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// API to get local network details & QR Code for pairing
+// API to get network details & QR Code for pairing
 app.get('/api/info', async (req, res) => {
   const localIp = getLocalIp();
   const room = req.query.room || 'sync';
-  const url = `http://${localIp}:${PORT}/?room=${encodeURIComponent(room)}`;
+  
+  // Detect if running on Cloud (Render, Railway, etc.) or Local Wi-Fi
+  const host = req.headers.host || `localhost:${PORT}`;
+  const isLocalHost = host.includes('localhost') || host.startsWith('127.') || host.startsWith('192.168.') || host.startsWith('10.');
+  const protocol = req.headers['x-forwarded-proto'] || req.protocol || 'http';
+  
+  const baseUrl = isLocalHost ? `http://${localIp}:${PORT}` : `${protocol}://${host}`;
+  const url = `${baseUrl}/?room=${encodeURIComponent(room)}`;
 
   try {
     const qrDataUrl = await QRCode.toDataURL(url, {

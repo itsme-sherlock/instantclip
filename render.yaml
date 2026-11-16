@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: instantclip
+    runtime: node
+    plan: free
+    region: oregon
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_VERSION
+        value: 22.0.0
