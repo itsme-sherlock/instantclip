@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>InstantClip — Instant Mobile & Laptop Sync</title>
+  <meta name="description" content="Instant real-time text & clipboard transfer between Phone and Laptop">
+  <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#080b11">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div class="mobile-shell">
+    
+    <!-- Top App Navigation -->
+    <header class="app-header">
+      <div class="brand">
+        <div class="brand-badge">
+          <svg class="icon-brand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+          </svg>
+        </div>
+        <div class="brand-info">
+          <h1 class="brand-title">InstantClip</h1>
+          <span class="brand-badge-pill" id="room-header-pill">
+            <span class="dot-live"></span>
+            <span id="room-name-display">sync</span>
+          </span>
+        </div>
+      </div>
+
+      <div class="header-controls">
+        <button id="device-status-btn" class="status-chip" title="Connected devices info">
+          <span class="status-indicator-dot" id="status-dot"></span>
+          <span id="device-count-text">1 Online</span>
+        </button>
+
+        <button id="open-pair-modal-btn" class="icon-btn-round pair-trigger" title="Pair Phone or Laptop">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="7"></rect>
+            <rect x="14" y="3" width="7" height="7"></rect>
+            <rect x="14" y="14" width="7" height="7"></rect>
+            <rect x="3" y="14" width="7" height="7"></rect>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Subheader / Quick State Banner -->
+    <section class="network-banner" id="network-banner">
+      <div class="banner-content">
+        <div class="banner-icon-box">
+          <svg class="banner-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 12.55a11 11 0 0 1 14.08 0"></path>
+            <path d="M1.42 9a16 16 0 0 1 21.16 0"></path>
+            <path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path>
+            <line x1="12" y1="20" x2="12.01" y2="20"></line>
+          </svg>
+        </div>
+        <div class="banner-text">
+          <span class="banner-headline" id="peer-status-title">Ready to Sync</span>
+          <span class="banner-subline" id="peer-status-desc">Pair your phone with the QR code to begin</span>
+        </div>
+      </div>
+      <div class="banner-actions">
+        <label class="compact-toggle" title="Automatically copy incoming clips">
+          <input type="checkbox" id="auto-copy-toggle" checked>
+          <span class="compact-slider"></span>
+          <span class="toggle-text">Auto-copy</span>
+        </label>
+      </div>
+    </section>
+
+    <!-- Main Scrollable Feed Area -->
+    <main class="feed-viewport">
+      <div class="feed-header-meta">
+        <span class="section-label">CLIPBOARD TIMELINE</span>
+        <button id="clear-all-btn" class="link-btn-subtle" title="Clear history">Clear</button>
+      </div>
+
+      <div id="clips-list" class="clips-stream">
+        <!-- Empty state placeholder -->
+        <div class="empty-state-card" id="empty-state">
+          <div class="empty-illustration">
+            <div class="pulse-ring"></div>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+              <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+              <line x1="9" y1="12" x2="15" y2="12"></line>
+              <line x1="9" y1="16" x2="13" y2="16"></line>
+            </svg>
+          </div>
+          <h3>Waiting for your first clip</h3>
+          <p>Tap <strong>Paste & Send</strong> below, or copy text on your paired device.</p>
+        </div>
+      </div>
+    </main>
+
+    <!-- Thumb-Zone Dock (Bottom 1/3 Screen) -->
+    <footer class="thumb-dock">
+      <!-- Composer Input Row -->
+      <div class="dock-composer">
+        <div class="composer-field-wrap">
+          <textarea 
+            id="clip-input" 
+            placeholder="Type or paste text, OTP, link..." 
+            rows="1"
+          ></textarea>
+        </div>
+
+        <button id="send-btn" class="dock-action-btn primary-send-btn" title="Send (Ctrl+Enter)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="22" y1="2" x2="11" y2="13"></line>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Quick Action Buttons in Primary Thumb Reach -->
+      <div class="thumb-quick-bar">
+        <button id="paste-send-btn" class="quick-action-pill highlight-pill" title="1-tap paste from clipboard and transmit">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+            <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+          </svg>
+          <span>Paste & Send</span>
+        </button>
+
+        <button id="quick-qr-btn" class="quick-action-pill secondary-pill" title="Show QR Code">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="7" height="7"></rect>
+            <rect x="14" y="3" width="7" height="7"></rect>
+            <rect x="14" y="14" width="7" height="7"></rect>
+            <rect x="3" y="14" width="7" height="7"></rect>
+          </svg>
+          <span>Pair Phone</span>
+        </button>
+      </div>
+    </footer>
+
+    <!-- Pairing & Room Bottom Sheet / Modal -->
+    <div id="pair-modal" class="sheet-backdrop hidden">
+      <div class="sheet-modal">
+        <div class="sheet-drag-handle"></div>
+        
+        <div class="sheet-header">
+          <div class="sheet-title-group">
+            <h3>Pair Your Devices</h3>
+            <p>Connect phone & laptop without passwords</p>
+          </div>
+          <button id="close-modal-btn" class="icon-btn-ghost">&times;</button>
+        </div>
+
+        <div class="sheet-body">
+          <!-- QR Visual Card -->
+          <div class="qr-showcase-card">
+            <div class="qr-canvas-container">
+              <div id="qr-loading" class="qr-spinner">Generating QR code...</div>
+              <img id="qr-image" class="qr-img hidden" alt="QR Code to Pair" />
+            </div>
+            <div class="qr-badge-status">
+              <span class="pulse-dot"></span>
+              <span>Point phone camera to connect</span>
+            </div>
+          </div>
+
+          <!-- Direct URL -->
+          <div class="link-field-group">
+            <span class="field-label">Direct Connection URL</span>
+            <div class="copy-input-row">
+              <input type="text" id="pair-url-input" readonly />
+              <button id="copy-url-btn" class="btn-copy-link">Copy</button>
+            </div>
+          </div>
+
+          <!-- Room Selector -->
+          <div class="room-field-group">
+            <span class="field-label">Private Sync Room</span>
+            <div class="room-change-row">
+              <input type="text" id="modal-room-input" placeholder="e.g. sync" />
+              <button id="change-room-btn" class="btn-room-switch">Switch</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notification Toast Container -->
+    <div id="toast-container" class="toast-hub"></div>
+
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/app.js"></script>
+</body>
+</html>
