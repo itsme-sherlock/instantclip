@@ -372,35 +372,96 @@ input:checked + .compact-slider:before {
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
+  width: 100%;
 }
 
-/* --- Clip Card (Designed for Emotion & Instant Copy) --- */
+/* --- WhatsApp-Style Conversation Bubble (Clip Card) --- */
 .clip-item-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border-subtle);
+  width: 88%;
+  max-width: 480px;
+  min-width: 240px;
   border-radius: var(--radius-lg);
-  padding: var(--space-4);
+  padding: 12px 14px;
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
+  gap: var(--space-2);
   box-shadow: var(--shadow-card);
   transition: transform 0.2s var(--ease-spring), border-color 0.2s;
   animation: cardEnter 0.25s var(--ease-spring);
 }
 
-@keyframes cardEnter {
-  from {
-    opacity: 0;
-    transform: translateY(12px) scale(0.98);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
+/* Outgoing Message (Sent by this device -> Slightly Right-Aligned) */
+.clip-item-card.msg-outgoing {
+  align-self: flex-end;
+  margin-left: auto;
+  background: #005c4b; /* WhatsApp dark mode outgoing bubble */
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  border-bottom-right-radius: 4px; /* WhatsApp bubble tail */
 }
 
-.clip-item-card:hover {
-  border-color: rgba(56, 189, 248, 0.25);
+.clip-item-card.msg-outgoing:hover {
+  border-color: rgba(52, 211, 153, 0.5);
+}
+
+.clip-item-card.msg-outgoing .sender-pill {
+  color: #a7f3d0;
+}
+
+.clip-item-card.msg-outgoing .device-badge-icon {
+  color: #34d399;
+}
+
+.clip-item-card.msg-outgoing .card-content-preview {
+  background: rgba(0, 0, 0, 0.22);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.clip-item-card.msg-outgoing .copy-cta-btn {
+  background: rgba(0, 0, 0, 0.25);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.clip-item-card.msg-outgoing .copy-cta-btn:hover {
+  background: rgba(0, 0, 0, 0.4);
+}
+
+/* Incoming Message (Received from other device -> Slightly Left-Aligned) */
+.clip-item-card.msg-incoming {
+  align-self: flex-start;
+  margin-right: auto;
+  background: #1f2c34; /* WhatsApp dark mode incoming bubble */
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom-left-radius: 4px; /* WhatsApp bubble tail */
+}
+
+.clip-item-card.msg-incoming:hover {
+  border-color: rgba(56, 189, 248, 0.35);
+}
+
+.clip-item-card.msg-incoming .sender-pill {
+  color: #38bdf8;
+}
+
+.clip-item-card.msg-incoming .device-badge-icon {
+  color: #38bdf8;
+}
+
+.clip-item-card.msg-incoming .card-content-preview {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.meta-right-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.wa-checks {
+  color: #53bdeb; /* WhatsApp blue ticks */
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: -2px;
+  line-height: 1;
 }
 
 .card-top-row {

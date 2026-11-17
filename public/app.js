@@ -13,6 +13,13 @@
   currentRoom = currentRoom.trim().toLowerCase();
   localStorage.setItem('instantclip_room', currentRoom);
 
+  // Persistent Client UUID across reconnects and refreshes
+  let myClientId = localStorage.getItem('instantclip_client_id');
+  if (!myClientId) {
+    myClientId = 'client_' + Math.random().toString(36).substring(2, 9) + Date.now().toString(36);
+    localStorage.setItem('instantclip_client_id', myClientId);
+  }
+
   let autoCopy = localStorage.getItem('instantclip_autocopy') !== 'false';
 
   // Clean URL params cleanly
@@ -135,7 +142,8 @@
     socket.emit('join-room', {
       room: currentRoom,
       deviceType: myDevice.type,
-      deviceName: myDevice.name
+      deviceName: myDevice.name,
+      clientId: myClientId
     });
   });
 
@@ -170,7 +178,7 @@
   socket.on('new-clip', (clip) => {
     addClipToTop(clip);
 
-    const isFromMe = clip.senderSocketId === socket.id;
+    const isFromMe = clip.senderClientId ? (clip.senderClientId === myClientId) : (clip.senderSocketId === socket.id);
 
     if (!isFromMe) {
       playAudioChime();
@@ -250,7 +258,9 @@
 
   function createClipElement(clip) {
     const card = document.createElement('div');
-    card.className = 'clip-item-card';
+    const isFromMe = clip.senderClientId ? (clip.senderClientId === myClientId) : (clip.senderSocketId === socket.id);
+    
+    card.className = `clip-item-card ${isFromMe ? 'msg-outgoing' : 'msg-incoming'}`;
     card.id = clip.id;
 
     const isLink = isUrl(clip.content);
@@ -260,13 +270,19 @@
       ? `<svg class="device-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>`
       : `<svg class="device-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>`;
 
+    const senderDisplay = isFromMe ? 'You (this device)' : escapeHtml(clip.senderName);
+    const statusTicks = isFromMe ? `<span class="wa-checks" title="Sent & Delivered">✓✓</span>` : '';
+
     card.innerHTML = `
       <div class="card-top-row">
         <div class="sender-pill">
           ${deviceIconSvg}
-          <span>${escapeHtml(clip.senderName)}</span>
+          <span>${senderDisplay}</span>
         </div>
-        <div class="card-timestamp">${formatTime(clip.timestamp)}</div>
+        <div class="meta-right-group">
+          <span class="card-timestamp">${formatTime(clip.timestamp)}</span>
+          ${statusTicks}
+        </div>
       </div>
 
       <div class="card-content-preview">${escapeHtml(clip.content)}</div>
@@ -363,7 +379,8 @@
     if (!content || !content.trim()) return;
     socket.emit('send-clip', {
       content: content.trim(),
-      deviceName: myDevice.name
+      deviceName: myDevice.name,
+      senderClientId: myClientId
     });
     clipInput.value = '';
     triggerHaptic('light');

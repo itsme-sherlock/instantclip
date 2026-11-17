@@ -153,6 +153,7 @@ io.on('connection', (socket) => {
       type, // 'text', 'url', 'code', 'image'
       senderName: deviceName || (clientDeviceInfo ? clientDeviceInfo.name : 'Unknown Device'),
       senderSocketId: socket.id,
+      senderClientId: payload.senderClientId || socket.id,
       timestamp: Date.now()
     };
 
